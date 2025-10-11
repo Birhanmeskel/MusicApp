@@ -80,7 +80,7 @@ function* filterSongSaga(action: ReturnType<typeof filterSongRequest>) {
   }
 }
 
-export function* musicSaga() {
+export default function* musicSaga() {
   yield takeEvery(fetchSongsRequest.type, fetchSongsSaga);
   yield takeEvery(addSongRequest.type, addSongSaga);
   yield takeEvery(updateSongRequest.type, updateSongSaga);
