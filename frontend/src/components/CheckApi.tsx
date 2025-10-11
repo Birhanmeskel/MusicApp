@@ -1,5 +1,5 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
-import axios from "axios"
 
 const API_URL = "http://localhost:5000"; // test
 
@@ -9,8 +9,9 @@ const CheckApi: React.FC = () => {
     const checkBackend = async () => {
       try {
         const response = await axios.get(`${API_URL}/test`);
+        console.log(response);
         if (response.status === 200) {
-          setStatus("✅ Backend is running: " + response.data.message);
+          setStatus("✅ Backend is running: " + response.data);
         } else {
           setStatus("⚠️ Backend responded with an error");
         }
