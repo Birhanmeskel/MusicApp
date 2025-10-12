@@ -4,4 +4,4 @@ export interface Music {
   artist: string;
   album: string;
   genre: string;
-}
+} 
