@@ -1,59 +1,104 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../app/store";
-import { addSongRequest } from "../features/music/MusicSlice";
-import { Music } from "../features/music/types";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../app/store";
+import { addSong, updateSong } from "../features/music/MusicSlice";
+import { Song } from "../features/music/types";
 
-const MusicForm: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const [title, setTitle] = useState("");
-  const [artist, setArtist] = useState("");
-  const [album, setAlbum] = useState("");
-  const [genre, setGenre] = useState("");
+interface Props {
+  editSong?: Song | null;
+  onFinish?: () => void; // Optional callback when form completes (for closing modals, etc.)
+}
 
- const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Dispatch request action; saga will call the API and trigger success action
-    dispatch(addSongRequest({
-       title,
-        artist,
-         album,
-          genre 
-        } as Omit<Music, "id">));
-    // Clear form fields
-    setTitle("");
-    setArtist("");
-    setAlbum("");
-    setGenre("");
+const MusicForm: React.FC<Props> = ({ editSong = null, onFinish }) => {
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state: RootState) => state.music);
+
+  const [formData, setFormData] = useState<Song>(
+    editSong || { title: "", artist: "", album: "", genre: "" }
+  );
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!formData.title || !formData.artist) {
+      alert("Title and Artist are required!");
+      return;
+    }
+
+    if (editSong && editSong._id) {
+      dispatch(updateSong({ id: editSong._id, data: formData }));
+    } else {
+      dispatch(addSong(formData));
+    }
+
+    setFormData({ title: "", artist: "", album: "", genre: "" });
+    if (onFinish) onFinish();
+  };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Add New Song</h2>
+    <form
+      onSubmit={handleSubmit}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
+        maxWidth: "400px",
+        marginBottom: "30px",
+      }}
+    >
+      <h2>{editSong ? "✏️ Edit Song" : "➕ Add New Song"}</h2>
+
       <input
-        placeholder="Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
+        type="text"
+        name="title"
+        placeholder="Song Title"
+        value={formData.title}
+        onChange={handleChange}
       />
+
       <input
+        type="text"
+        name="artist"
         placeholder="Artist"
-        value={artist}
-        onChange={(e) => setArtist(e.target.value)}
+        value={formData.artist}
+        onChange={handleChange}
       />
+
       <input
+        type="text"
+        name="album"
         placeholder="Album"
-        value={album}
-        onChange={(e) => setAlbum(e.target.value)}
+        value={formData.album}
+        onChange={handleChange}
       />
+
       <input
+        type="text"
+        name="genre"
         placeholder="Genre"
-        value={genre}
-        onChange={(e) => setGenre(e.target.value)}
+        value={formData.genre}
+        onChange={handleChange}
       />
-      <button type="submit">Add Song</button>
+
+      <button
+        type="submit"
+        style={{
+          backgroundColor: "#2ecc71",
+          border: "none",
+          color: "white",
+          padding: "8px 12px",
+          borderRadius: "6px",
+          cursor: "pointer",
+        }}
+      >
+        {loading ? "Saving..." : editSong ? "Update Song" : "Add Song"}
+      </button>
     </form>
   );
-}
+};
 
 export default MusicForm;

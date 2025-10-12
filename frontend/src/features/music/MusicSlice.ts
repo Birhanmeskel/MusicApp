@@ -1,88 +1,104 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { MusicState, Song, MusicStats } from "./types";
 
-import { Music } from "./types"
-
-interface MusicState {
-  songs: Music[];
-  loading: boolean;
-  error: string | null;
-  stats: any;
-}
-
+// Initial state
 const initialState: MusicState = {
   songs: [],
+  stats: null,
   loading: false,
   error: null,
-  stats: null,
+  filter: {},
 };
 
-export const musicSlice = createSlice({
-
- name: "music",
-  initialState, 
-  reducers:{
-    fetchSongsRequest: (state) => {
+const musicSlice = createSlice({
+  name: "music",
+  initialState,
+  reducers: {
+    // Fetch Songs
+    fetchSongs: (state, action: PayloadAction<{ genre?: string; artist?: string; album?: string } | undefined>) => {
       state.loading = true;
+      state.filter = action.payload || {};
     },
-    fetchSongsSuccess: (state, action: PayloadAction<Music[]>) => {
-      state.loading = false;
+    fetchSongsSuccess: (state, action: PayloadAction<Song[]>) => {
       state.songs = action.payload;
-      state.error = null;
+      state.loading = false;
     },
     fetchSongsFailure: (state, action: PayloadAction<string>) => {
+      state.loading = false;
       state.error = action.payload;
+    },
+
+    //  Create Song
+    addSong: (state, _action: PayloadAction<Song>) => {
+      state.loading = true;
+    },
+    addSongSuccess: (state, action: PayloadAction<Song>) => {
+      state.songs.unshift(action.payload);
       state.loading = false;
     },
-    // ADD SONG
-    addSongRequest: (state, action: PayloadAction<Omit<Music, "id">>) => {},
-
-    addSongSuccess: (state, action: PayloadAction<Music>) => {
-      state.songs.push(action.payload);
-    },
-    updateSongRequest: (state, action: PayloadAction<Music>) => {},
-
-    updateSongSuccess: (state, action: PayloadAction<Music>) => {
-      const idx = state.songs.findIndex((s) => s.id === action.payload.id);
-      if (idx >= 0) state.songs[idx] = action.payload;
+    addSongFailure: (state, action: PayloadAction<string>) => {
+      state.loading = false;
+      state.error = action.payload;
     },
 
-     // DELETE SONG
-    deleteSongRequest: (state, action: PayloadAction<string>) => {},
+    //  Update Song
+    updateSong: (state, _action: PayloadAction<{ id: string; data: Song }>) => {
+      state.loading = true;
+    },
+    updateSongSuccess: (state, action: PayloadAction<Song>) => {
+      const index = state.songs.findIndex((s) => s._id === action.payload._id);
+      if (index !== -1) state.songs[index] = action.payload;
+      state.loading = false;
+    },
+    updateSongFailure: (state, action: PayloadAction<string>) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
+
+    //  Delete Song
+    deleteSong: (state, _action: PayloadAction<string>) => {
+      state.loading = true;
+    },
     deleteSongSuccess: (state, action: PayloadAction<string>) => {
-      state.songs = state.songs.filter((s) => s.id !== action.payload);
+      state.songs = state.songs.filter((song) => song._id !== action.payload);
+      state.loading = false;
+    },
+    deleteSongFailure: (state, action: PayloadAction<string>) => {
+      state.loading = false;
+      state.error = action.payload;
     },
 
-      // STATS
-    fetchStatsRequest: (state) => {},
-    fetchStatsSuccess: (state, action: PayloadAction<any>) => {
+    //  Fetch Stats
+    fetchStats: (state) => {
+      state.loading = true;
+    },
+    fetchStatsSuccess: (state, action: PayloadAction<MusicStats>) => {
       state.stats = action.payload;
+      state.loading = false;
     },
-
-    // FILTER SONG
-    filterSongRequest: (state, action: PayloadAction<string>) => {},
-    filterSongSuccess: (state, action: PayloadAction<Music[]>) => {
-      state.songs = action.payload;
+    fetchStatsFailure: (state, action: PayloadAction<string>) => {
+      state.loading = false;
+      state.error = action.payload;
     },
-
-
-  }
-
-})
+  },
+});
 
 export const {
-   fetchSongsRequest,
+  fetchSongs,
   fetchSongsSuccess,
   fetchSongsFailure,
-  addSongRequest,
+  addSong,
   addSongSuccess,
-  updateSongRequest,
+  addSongFailure,
+  updateSong,
   updateSongSuccess,
-  deleteSongRequest,
+  updateSongFailure,
+  deleteSong,
   deleteSongSuccess,
-  fetchStatsRequest,
+  deleteSongFailure,
+  fetchStats,
   fetchStatsSuccess,
-  filterSongRequest,
-  filterSongSuccess,
-}= musicSlice.actions;
+  fetchStatsFailure,
+} = musicSlice.actions;
 
 export default musicSlice.reducer;

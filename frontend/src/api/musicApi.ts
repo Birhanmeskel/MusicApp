@@ -1,24 +1,42 @@
-import axios from 'axios';
-import { Music } from '../features/music/types';
+import axios from "axios";
+import { MusicStats, Song } from "../features/music/types";
 
-const API_URL = 'http://localhost:5000/api';
+// Base API URL
+const API_BASE_URL = "http://localhost:5000/api";
 
-export const fetchSongs = () => axios.get<Music[]>(`${API_URL}/songs`);
+// SONGS API
+export const getSongs = async (filters?: {
+  genre?: string;
+  artist?: string;
+  album?: string;
+}): Promise<Song[]> => {
+  const params = new URLSearchParams();
 
-export const addSong = (song: Omit<Music, 'id'>) =>
-  axios.post<Music>(`${API_URL}/songs`, song);
+  if (filters?.genre) params.append("genre", filters.genre);
+  if (filters?.artist) params.append("artist", filters.artist);
+  if (filters?.album) params.append("album", filters.album);
 
-export const updateSong = (song: Music) =>
-  axios.put<Music>(`${API_URL}/songs/${song.id}`, song);
+  const response = await axios.get(`${API_BASE_URL}/songs?${params.toString()}`);
+  return response.data;
+};
 
-export const deleteSong = (id: string) =>
-  axios.delete<{ message: string }>(`${API_URL}/songs/${id}`);
-// export const deleteSong = (id: string) =>
-//   axios.delete<{ message: string }>(`${API_URL}/songs/${id}`);
+export const createSong = async (song: Song): Promise<Song> => {
+  const response = await axios.post(`${API_BASE_URL}/songs`, song);
+  return response.data;
+};
 
-export const fetchStats = () => axios.get(`${API_URL}/stats`);
+export const updateSong = async (id: string, song: Song): Promise<Song> => {
+  const response = await axios.put(`${API_BASE_URL}/songs/${id}`, song);
+  return response.data;
+};
 
-export const filterSong = (query: string) =>
-  axios.get<Music[]>(`${API_URL}/songs`, {
-    params: { q: query },
-  });
+export const deleteSong = async (id: string): Promise<{ message: string }> => {
+  const response = await axios.delete(`${API_BASE_URL}/songs/${id}`);
+  return response.data;
+};
+
+// STATS API
+export const getMusicStats = async (): Promise<MusicStats> => {
+  const response = await axios.get(`${API_BASE_URL}/stats`);
+  return response.data;
+};

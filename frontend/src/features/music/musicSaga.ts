@@ -1,90 +1,105 @@
-import { call, put, takeEvery } from "redux-saga/effects";
+import toast from "react-hot-toast";
+import { call, put, takeLatest } from "redux-saga/effects";
+
 import {
-  fetchSongs,
   addSong,
-  updateSong,
-  deleteSong,
-  fetchStats,
-  filterSong
-} from "../../api/musicApi";
-
-
-import {
-  fetchSongsRequest,
-  fetchSongsSuccess,
-  fetchSongsFailure,
-  addSongRequest,
+  addSongFailure,
   addSongSuccess,
-  updateSongRequest,
-  updateSongSuccess,
-  deleteSongRequest,
+  deleteSong,
+  deleteSongFailure,
   deleteSongSuccess,
-  fetchStatsRequest,
+  fetchSongs,
+  fetchSongsFailure,
+  fetchSongsSuccess,
+  fetchStats,
+  fetchStatsFailure,
   fetchStatsSuccess,
-  filterSongRequest,
-  filterSongSuccess,
+  updateSong,
+  updateSongFailure,
+  updateSongSuccess,
 } from "./MusicSlice";
 
-function* fetchSongsSaga(){
-  try {
-    const { data } = yield call(fetchSongs);
-    yield put(fetchSongsSuccess(data));
-  } catch (error) {
-    // yield put(fetchSongsFailure(error.message));
-    console.error(error);
-  }
-}
+import {
+  createSong,
+  deleteSong as deleteSongApi,
+  getMusicStats,
+  getSongs,
+  updateSong as updateSongApi,
+} from "../../api/musicApi";
 
-function* addSongSaga(action: ReturnType<typeof addSongRequest>) {
+import { PayloadAction } from "@reduxjs/toolkit";
+import { Song } from "./types";
+
+// Fetch Songs
+function* fetchSongsWorker(action: PayloadAction<{ genre?: string; artist?: string; album?: string } | undefined>): any {
   try {
-    const { data } = yield call(addSong, action.payload);
-    yield put(addSongSuccess(data));
+    const songs = yield call(getSongs, action.payload);
+    yield put(fetchSongsSuccess(songs));
   } catch (error: any) {
-    console.error(error);
+    yield put(fetchSongsFailure(error.message));
+    toast.error("Failed to load songs");
   }
 }
 
-function* updateSongSaga(action: ReturnType<typeof updateSongRequest>) {
+// Add Song
+function* addSongWorker(action: PayloadAction<Song>): any {
   try {
-    const { data } = yield call(updateSong, action.payload);
-    yield put(updateSongSuccess(data));
+    const newSong = yield call(createSong, action.payload);
+    yield put(addSongSuccess(newSong));
+     toast.success("Song added successfully");
+    yield put(fetchSongs({}));
+    yield put(fetchStats());
   } catch (error: any) {
-    console.error(error);
+    yield put(addSongFailure(error.message));
+    toast.error("Failed to add song");
+  }
+  
+}
+
+//  Update Song
+function* updateSongWorker(action: PayloadAction<{ id: string; data: Song }>): any {
+  try {
+    const updated = yield call(updateSongApi, action.payload.id, action.payload.data);
+    yield put(updateSongSuccess(updated));
+    toast.success("Song updated successfully");
+    yield put(fetchSongs({}));
+    yield put(fetchStats());
+  } catch (error: any) {
+    yield put(updateSongFailure(error.message));
+    toast.error("Failed to update song");
   }
 }
 
-function* deleteSongSaga(action: ReturnType<typeof deleteSongRequest>) {
+// Delete Song
+function* deleteSongWorker(action: PayloadAction<string>): any {
   try {
-    yield call(deleteSong, action.payload);
+    yield call(deleteSongApi, action.payload);
     yield put(deleteSongSuccess(action.payload));
+    toast.success("Song deleted successfully");
+    // Auto-refresh list & stats
+    yield put(fetchSongs({}));
+    yield put(fetchStats());
   } catch (error: any) {
-    console.error(error);
+    yield put(deleteSongFailure(error.message));
+    toast.error("Failed to delete song");
   }
 }
 
-function* fetchStatsSaga() {
+//  Fetch Stats
+function* fetchStatsWorker(): any {
   try {
-    const { data } = yield call(fetchStats);
-    yield put(fetchStatsSuccess(data));
+    const stats = yield call(getMusicStats);
+    yield put(fetchStatsSuccess(stats));
   } catch (error: any) {
-    console.error(error);
+    yield put(fetchStatsFailure(error.message));
   }
 }
 
-function* filterSongSaga(action: ReturnType<typeof filterSongRequest>) {
-  try {
-    const { data } = yield call(filterSong, action.payload);
-    yield put(filterSongSuccess(data));
-  } catch (error: any) {
-    console.error(error);
-  }
-}
-
+//  Watcher Saga
 export default function* musicSaga() {
-  yield takeEvery(fetchSongsRequest.type, fetchSongsSaga);
-  yield takeEvery(addSongRequest.type, addSongSaga);
-  yield takeEvery(updateSongRequest.type, updateSongSaga);
-  yield takeEvery(deleteSongRequest.type, deleteSongSaga);
-  yield takeEvery(fetchStatsRequest.type, fetchStatsSaga);
-  yield takeEvery(filterSongRequest.type, filterSongSaga);
+  yield takeLatest(fetchSongs.type, fetchSongsWorker);
+  yield takeLatest(addSong.type, addSongWorker);
+  yield takeLatest(updateSong.type, updateSongWorker);
+  yield takeLatest(deleteSong.type, deleteSongWorker);
+  yield takeLatest(fetchStats.type, fetchStatsWorker);
 }
