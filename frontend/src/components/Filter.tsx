@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { fetchSongs } from "../features/music/MusicSlice";
+import { Box, Button, Card, Input, Row } from "./ui/primitives";
 
 const Filter: React.FC = () => {
   const dispatch = useDispatch();
@@ -20,31 +21,16 @@ const Filter: React.FC = () => {
   };
 
   return (
-    <div style={{ marginBottom: "20px" }}>
-      <h2>🎚️ Filter Songs</h2>
-      <div style={{ display: "flex", gap: "10px" }}>
-        <input
-          name="genre"
-          value={filters.genre}
-          onChange={handleChange}
-          placeholder="Genre"
-        />
-        <input
-          name="artist"
-          value={filters.artist}
-          onChange={handleChange}
-          placeholder="Artist"
-        />
-        <input
-          name="album"
-          value={filters.album}
-          onChange={handleChange}
-          placeholder="Album"
-        />
-        <button onClick={handleFilter}>Apply</button>
-        <button onClick={handleReset}>Reset</button>
-      </div>
-    </div>
+    <Card p={3} mb={3}>
+      <Box as="h2" m={0} mb={2} fontSize="18px">🎚️ Filter Songs</Box>
+      <Row gap="10px" flexWrap="wrap">
+        <Box flex="1 1 200px"><Input name="genre" value={filters.genre} onChange={handleChange} placeholder="Genre" /></Box>
+        <Box flex="1 1 200px"><Input name="artist" value={filters.artist} onChange={handleChange} placeholder="Artist" /></Box>
+        <Box flex="1 1 200px"><Input name="album" value={filters.album} onChange={handleChange} placeholder="Album" /></Box>
+        <Button onClick={handleFilter}>Apply</Button>
+        <Button variant="ghost" onClick={handleReset}>Reset</Button>
+      </Row>
+    </Card>
   );
 };
 

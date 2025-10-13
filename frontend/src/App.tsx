@@ -1,19 +1,19 @@
-import React from "react";
-import Filter from "./components/Filter";
-import MusicForm from "./components/MusicForm";
-import MusicList from "./components/MusicList";
-import MusicStats from "./components/MusicStats";
+import React from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Layout from './components/layout/Layout';
+import HomePage from './pages/HomePage';
+import StatsPage from './pages/StatsPage';
 
 const App: React.FC = () => {
   return (
-    <div style={{ padding: "20px", fontFamily: "Arial" }}>
-      <h1>🎧 Music Library Dashboard</h1>
-
-      <MusicForm />
-      <Filter />
-      <MusicList />
-      <MusicStats />
-    </div>
+    <BrowserRouter>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/stats" element={<StatsPage />} />
+        </Routes>
+      </Layout>
+    </BrowserRouter>
   );
 };
 

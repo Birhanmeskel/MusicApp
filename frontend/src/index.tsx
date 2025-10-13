@@ -7,6 +7,7 @@ import reportWebVitals from './reportWebVitals';
 import { Toaster } from "react-hot-toast";
 import { Provider } from 'react-redux';
 import { store } from './app/store';
+import { GlobalStyles } from './components/ui/theme';
 
 
 const root = ReactDOM.createRoot(
@@ -15,6 +16,7 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <Provider store={store}>
+       <GlobalStyles />
        <App />
        <Toaster position="top-right" reverseOrder={false} />
     </Provider>
