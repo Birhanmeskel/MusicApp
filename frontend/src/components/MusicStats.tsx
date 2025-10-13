@@ -2,7 +2,8 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../app/store";
 import { fetchStats } from "../features/music/MusicSlice";
-import { Box, Card, Row } from "./ui/primitives";
+import { StatsCard, StatsRow, StatsTitle } from "./MusicStats.styles";
+import { Card } from "./ui/Card.styles";
 
 const MusicStats: React.FC = () => {
   const dispatch = useDispatch();
@@ -17,15 +18,15 @@ const MusicStats: React.FC = () => {
   if (!stats) return <p>No statistics available.</p>;
 
   return (
-    <Card p={3} mt={4}>
-      <Box as="h2" m={0} mb={3} fontSize="20px">📊 Music Statistics</Box>
-      <Row gap="30px" flexWrap="wrap" mb={3}>
-        <Box><strong>Total Songs:</strong> {stats.totalSongs}</Box>
-        <Box><strong>Artists:</strong> {stats.totalArtists}</Box>
-        <Box><strong>Albums:</strong> {stats.totalAlbums}</Box>
-        <Box><strong>Genres:</strong> {stats.totalGenres}</Box>
-      </Row>
-      <Box as="h3" mt={0}>🎼 Songs by Genre</Box>
+    <Card as={StatsCard}>
+      <StatsTitle>📊 Music Statistics</StatsTitle>
+      <StatsRow>
+        <div><strong>Total Songs:</strong> {stats.totalSongs}</div>
+        <div><strong>Artists:</strong> {stats.totalArtists}</div>
+        <div><strong>Albums:</strong> {stats.totalAlbums}</div>
+        <div><strong>Genres:</strong> {stats.totalGenres}</div>
+      </StatsRow>
+      <h3 style={{ marginTop: 0 }}>🎼 Songs by Genre</h3>
       <ul>
         {stats.genres.map((g) => (
           <li key={g._id}>
@@ -33,7 +34,7 @@ const MusicStats: React.FC = () => {
           </li>
         ))}
       </ul>
-      <Box as="h3">🎤 Songs per Artist</Box>
+      <h3>🎤 Songs per Artist</h3>
       <ul>
         {stats.artists.map((artist) => (
           <li key={artist._id}>
@@ -41,7 +42,7 @@ const MusicStats: React.FC = () => {
           </li>
         ))}
       </ul>
-      <Box as="h3">💿 Songs per Album</Box>
+      <h3>💿 Songs per Album</h3>
       <ul>
         {stats.albums.map((album) => (
           <li key={album._id}>

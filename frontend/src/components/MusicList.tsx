@@ -5,7 +5,9 @@ import { deleteSong, fetchSongs } from "../features/music/MusicSlice";
 import { Song } from "../features/music/types";
 import ConfirmModal from "../pages/modals/ConfirmModal";
 import SongFormModal from "../pages/modals/SongFormModal";
-import { Box, Button, Card, Row } from "./ui/primitives";
+import { Actions, ItemRow, List, ListItem, ListTitle, ListWrap } from "./MusicList.styles";
+import { Button } from "./ui/Button.styles";
+import { Card } from "./ui/Card.styles";
 
 const MusicList: React.FC = () => {
   const dispatch = useDispatch();
@@ -23,30 +25,30 @@ const MusicList: React.FC = () => {
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
-    <Box mt={3}>
-      <Box as="h2" m={0} mb={2}>🎶 Song List</Box>
+    <ListWrap>
+      <ListTitle>🎶 Song List</ListTitle>
       {songs.length === 0 ? (
         <p>No songs found.</p>
       ) : (
-        <Box as="ul" p={0} m={0} style={{ listStyle: "none" }}>
+        <List>
           {songs.map((song) => (
-            <Box as="li" key={song._id} mb={2}>
-              <Card p={2}>
-                <Row alignItems="center" justifyContent="space-between" gap="8px" flexWrap="wrap">
-                  <Box>
-                    <Box as="strong">{song.title}</Box> — {song.artist}
+            <ListItem key={song._id}>
+              <Card style={{ padding: 12 }}>
+                <ItemRow>
+                  <div>
+                    <strong>{song.title}</strong> — {song.artist}
                     <br />
-                    <Box as="small">Album: {song.album || 'N/A'} | Genre: {song.genre || 'Unknown'}</Box>
-                  </Box>
-                  <Row gap="8px">
+                    <small>Album: {song.album || 'N/A'} | Genre: {song.genre || 'Unknown'}</small>
+                  </div>
+                  <Actions>
                     <Button type="button" onClick={() => { setEditingSong(song); setOpenEdit(true); }}>Edit</Button>
                     <Button type="button" variant="danger" onClick={() => setToDelete(song)}>Delete</Button>
-                  </Row>
-                </Row>
+                  </Actions>
+                </ItemRow>
               </Card>
-            </Box>
+            </ListItem>
           ))}
-        </Box>
+        </List>
       )}
       <SongFormModal isOpen={openEdit} onClose={() => { setOpenEdit(false); setEditingSong(null); }} editId={editingSong?._id} />
       <ConfirmModal
@@ -56,7 +58,7 @@ const MusicList: React.FC = () => {
         title="Delete this song?"
         description={`Are you sure you want to delete "${toDelete?.title}" by ${toDelete?.artist}?`}
       />
-    </Box>
+    </ListWrap>
   );
 };
 

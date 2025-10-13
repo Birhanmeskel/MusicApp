@@ -1,6 +1,55 @@
+import styled from '@emotion/styled';
 import React from 'react';
-import { Box, Button, Card, Row } from './primitives';
 import { colors, spacing } from './theme';
+
+const Overlay = styled.div`
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  padding: 24px;
+`;
+
+const Dialog = styled.div`
+  width: 100%;
+  max-width: 520px;
+  background: ${colors.panel};
+  border: 1px solid ${colors.border};
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+`;
+
+const DialogHead = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid ${colors.border};
+`;
+
+const DialogBody = styled.div`
+  padding: 16px;
+`;
+
+const DialogFoot = styled.div`
+  display: flex;
+  gap: ${spacing(1)};
+  justify-content: flex-end;
+  padding: 16px;
+  border-top: 1px solid ${colors.border};
+`;
+
+const GhostBtn = styled.button`
+  background: transparent;
+  color: ${colors.text};
+  border: 1px solid ${colors.border};
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+`;
 
 interface ModalProps {
   title?: string;
@@ -14,32 +63,18 @@ interface ModalProps {
 const Modal: React.FC<ModalProps> = ({ title, isOpen, onClose, footer, width = 520, children }) => {
   if (!isOpen) return null;
   return (
-    <Box
-      position="fixed"
-      top={0}
-      left={0}
-      right={0}
-      bottom={0}
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-      backgroundColor="rgba(0,0,0,0.5)"
-      zIndex={1000}
-      p={3}
-    >
-      <Card role="dialog" aria-modal="true" style={{ width: '100%', maxWidth: width }}>
-        <Row alignItems="center" justifyContent="space-between" p={3} borderBottom={`1px solid ${colors.border}`}>
-          <Box as="h3" m={0} fontSize="18px">{title}</Box>
-          <Button variant="ghost" onClick={onClose} aria-label="Close">✕</Button>
-        </Row>
-        <Box p={3}>{children}</Box>
+    <Overlay>
+      <Dialog role="dialog" aria-modal="true" style={{ maxWidth: width }}>
+        <DialogHead>
+          <h3 style={{ margin: 0, fontSize: 18 }}>{title}</h3>
+          <GhostBtn type="button" onClick={onClose} aria-label="Close">✕</GhostBtn>
+        </DialogHead>
+        <DialogBody>{children}</DialogBody>
         {footer !== undefined ? (
-          <Row p={3} gap={spacing(1)} justifyContent="flex-end" borderTop={`1px solid ${colors.border}`}>
-            {footer}
-          </Row>
+          <DialogFoot>{footer}</DialogFoot>
         ) : null}
-      </Card>
-    </Box>
+      </Dialog>
+    </Overlay>
   );
 };
 

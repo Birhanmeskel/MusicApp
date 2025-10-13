@@ -3,7 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../app/store";
 import { addSong, updateSong } from "../features/music/MusicSlice";
 import { Song } from "../features/music/types";
-import { Box, Button, Col, Input } from "./ui/primitives";
+import { FieldStack, FormTitle } from "./MusicForm.styles";
+import { Button } from "./ui/Button.styles";
+import { Input } from "./ui/Input.styles";
 
 interface Props {
   editSong?: Song | null;
@@ -54,16 +56,16 @@ const MusicForm: React.FC<Props> = ({ editSong = null, onFinish }) => {
   };
 
   return (
-    <Box as="form" onSubmit={handleSubmit}>
-      <Col gap="10px" maxWidth="480px">
-        <Box as="h2" m={0}>{editSong ? "✏️ Edit Song" : "➕ Add New Song"}</Box>
+    <form onSubmit={handleSubmit}>
+      <FormTitle>{editSong ? "✏️ Edit Song" : "➕ Add New Song"}</FormTitle>
+      <FieldStack>
         <Input type="text" name="title" placeholder="Song Title" value={formData.title} onChange={handleChange} />
         <Input type="text" name="artist" placeholder="Artist" value={formData.artist} onChange={handleChange} />
         <Input type="text" name="album" placeholder="Album" value={formData.album} onChange={handleChange} />
         <Input type="text" name="genre" placeholder="Genre" value={formData.genre} onChange={handleChange} />
         <Button type="submit">{loading ? "Saving..." : editSong ? "Update Song" : "Add Song"}</Button>
-      </Col>
-    </Box>
+      </FieldStack>
+    </form>
   );
 };
 
