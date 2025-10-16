@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  backend:
+    build: ./backend
+    container_name: backend_c
+    ports:
+      - '5000:5000'
+    volumes:
+      - ./backend:/server
+      - ./server/node_modules
+  frontend:
+    build: ./frontend
+    container_name: frontend_c
+    ports:
+      - '3000:3000'
+    stdin_open: true # standard in open property
+    tty: true # 
+
+# to share with others
+# hub.docker.com > signup > create repository
+# docker build -t birhan/myapi .       ---create image
+# login   ---    docker login
