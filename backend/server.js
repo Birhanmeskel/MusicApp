@@ -17,11 +17,11 @@ app.use("/api/songs", songRoutes);
 app.use("/api/stats", statsRoutes);
 
 app.get("/test", (req, res) => {
-  res.send("API is running...");
+  res.send("API is running...lol");
 });
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`API listening on: ${PORT}`);
 });

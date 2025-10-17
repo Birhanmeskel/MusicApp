@@ -1,5 +1,4 @@
-FROM node:17-alpine  
-# Use an official Node.js runtime as a parent image
+FROM node:20-alpine  
 
 RUN npm install -g nodemon
 
@@ -12,6 +11,5 @@ RUN npm install
 COPY . .
 
 EXPOSE 5000
-# required for docker desktop port mapping
 
 CMD ["npm", "run", "dev"]
